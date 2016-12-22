@@ -4,16 +4,14 @@
 \alias{JLS_test}
 \title{Joint Location Scale (JLS) Test}
 \usage{
-JLS_test(y, x, locAdd = FALSE, scaleAdd = FALSE)
+JLS_test(y, x.loc, x.scale)
 }
 \arguments{
 \item{y}{a qunatitative outcome variable}
 
-\item{x}{a categorical covariate}
+\item{x.loc}{a design matrix (or vector) for the location model}
 
-\item{locAdd}{TRUE/FALSE (default=FALSE). Whether the location model is additive (TRUE) or genotypic (FALSE).}
-
-\item{scaleAdd}{TRUE/FALSE (default=FALSE). Whether the scale model is additive (TRUE) or genotypic (FALSE).}
+\item{x.scale}{a design matrix (or vector) for the scale model}
 }
 \value{
 p_L the location test (regression t-test) p-value
@@ -48,10 +46,16 @@ E1<-rbinom(n,1,prob=pE1)
 ## Phenotype (y)
 y<-0.01*XG+0.3*E1+0.5*XG*E1+rnorm(n,0,1)
 
-JLS_test(y=y,x=XG)
+# Additive model (will work with dosages)
+JLS_test(y,XG,XG)
+# Genotypic model (will not work with dosages --> factor() will create many groups)
+JLS_test(y,factor(XG),factor(XG))
 
-## or
-JLS_test(y=y,x=XG,locAdd=TRUE,scaleAdd=TRUE)
+X2=round(cbind(XG==1,XG==2)) #convert to 2 columns
+
+# Genotypic model --> same result as results above using JLS_test(y,factor(X),factor(X))
+# This is how genotype probabilities will be analyzed (using a 2 column design matrix)
+JLS_test(y,X2,X2)
 }
 \author{
 David Soave

@@ -2,9 +2,8 @@
 #'
 #' This function performs the Joint Location Scale (JLS) test (Soave et al. 2015) to simultaneously test for mean and variance differences between groups.  The JLS test uses Fisher's combined p-value method to combine evidence from the individual locaiton (regression t-test) and scale (Levene's test of homogeneity of variances) tests.
 #' @param y a qunatitative outcome variable
-#' @param x a categorical covariate
-#' @param locAdd TRUE/FALSE (default=FALSE). Whether the location model is additive (TRUE) or genotypic (FALSE).
-#' @param scaleAdd TRUE/FALSE (default=FALSE). Whether the scale model is additive (TRUE) or genotypic (FALSE).
+#' @param x.loc a design matrix (or vector) for the location model
+#' @param x.scale a design matrix (or vector) for the scale model
 #' @keywords JLS
 #' @export
 #' @author David Soave
@@ -34,37 +33,25 @@
 #' ## Phenotype (y)
 #' y<-0.01*XG+0.3*E1+0.5*XG*E1+rnorm(n,0,1)
 #'
-#' JLS_test(y=y,x=XG)
+#'# Additive model (will work with dosages)
+#'JLS_test(y,XG,XG)
+#'# Genotypic model (will not work with dosages --> factor() will create many groups)
+#'JLS_test(y,factor(XG),factor(XG))
 #'
-#' ## or
-#' JLS_test(y=y,x=XG,locAdd=TRUE,scaleAdd=TRUE)
+#'X2=round(cbind(XG==1,XG==2)) #convert to 2 columns
+#'
+#'# Genotypic model --> same result as results above using JLS_test(y,factor(X),factor(X))
+#'# This is how genotype probabilities will be analyzed (using a 2 column design matrix)
+#'JLS_test(y,X2,X2)
 
 
 
 #Note that p_S is obtained using a stage 1 median regression (rq function, tau=0.5) where group medians are chosen to be the larger of two middle values when the group size is even.
-JLS_test <-function(y,x,locAdd=FALSE,scaleAdd=FALSE){
+JLS_test <-function(y,x.loc,x.scale){
 
   ## check if there is missing data
-  data <- cbind(y, x)
+  data <- cbind(y, x.loc,x.scale)
   if(sum(is.na(data)) > 0)  stop("missing value(s) not allowed")
-  if(sum(!((x - round(x))==0)) > 0)  stop("covariates must be integers")
-
-    if (locAdd == FALSE) {
-    x.loc<-factor(x)
-    lMETHOD <- "genotypic location model"
-  }
-  else {
-    x.loc<-as.numeric(x)
-    METHOD <- "additive location model"
-  }
-  if (scaleAdd == FALSE) {
-    x.scale<-factor(x)
-    lMETHOD <- "genotypic scale model"
-  }
-  else {
-    x.scale<-as.numeric(x)
-    METHOD <- "additive scale model"
-  }
 
 
   ## Obtain the p-values from the individual location and scale test
