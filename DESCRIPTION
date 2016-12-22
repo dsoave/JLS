@@ -1,7 +1,7 @@
 Package: JLS
 Type: Package
 Title: Joint Location Scale (JLS) Test
-Version: 0.1.0
+Version: 1.1.0
 Author: David Soave <david.soave@mail.utoronto.ca>
 Maintainer: David Soave <david.soave@mail.utoronto.ca>
 Description: Joint Location Scale (JLS) test to simultaneously test for mean and
